@@ -1,122 +1,150 @@
-﻿//using CityInfo.API.Controllers;
-//using CityInfo.API.Entities;
-//using CityInfo.API.Repositories;
-//using Microsoft.EntityFrameworkCore;
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Linq.Expressions;
-//using System.Threading.Tasks;
-//using Xunit;
+﻿using AutoMapper;
+using CityInfo.API.Controllers;
+using CityInfo.API.Entities;
+using CityInfo.API.Models;
+using CityInfo.API.Repositories;
+using CityInfo.Tests.FakeData;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
+using Xunit;
 
-//namespace CityInfo.Tests.Controllers
-//{
-//    public class CitiesControllerTests
-//    {
-//        CityInfoContext _context;
-//        ICityInfoRepository _repository;
+namespace CityInfo.Tests.Controllers
+{
+    public class CitiesControllerTests
+    {
+        IMapper _mapper;
 
-//        public CitiesControllerTests()
-//        {
-//            //services.AddAutoMapper(cfg =>
-//            //{
-//            //    cfg.CreateMap<Entities.City, Models.CityDto>();
-//            //    cfg.CreateMap<Models.CityDto, Entities.City>();
-//            //    cfg.CreateMap<Entities.PointOfInterest, Models.PointOfInterestDto>();
-//            //    cfg.CreateMap<Models.PointOfInterestDto, Entities.PointOfInterest>();
-//            //});
-//        }
+        public CitiesControllerTests()
+        {
+            _mapper = InitializeAutomapper();
+        }
 
-//        [Fact]
-//        public void PassingTest()
-//        {
-//            _context = CreateAndSeedContext();
-//            _repository = new CityInfoRepository(_context);
-//            var controller = new CitiesController(null, null, null, _repository);
+        private IMapper InitializeAutomapper()
+        {
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<API.Entities.City, API.Models.CityDto>();
+                cfg.CreateMap<API.Models.CityDto, API.Entities.City>();
+                cfg.CreateMap<API.Entities.PointOfInterest, API.Models.PointOfInterestDto>();
+                cfg.CreateMap<API.Models.PointOfInterestDto, API.Entities.PointOfInterest>();
+            });
 
-//            var results = controller.GetCities();
+            IMapper mapper = config.CreateMapper();
 
-//            Assert.NotNull(results);
-//        }
+            return mapper;
+        }
 
-//        private CityInfoContext CreateAndSeedContext()
-//        {
-//            var optionsBuilder = new DbContextOptionsBuilder<CityInfoContext>();
+        [Fact]
+        public void Get_All_Cities()
+        {
+            using (var fakeCityInfoData = new CityInfoFakeData())
+            {
+                var context = fakeCityInfoData.CreateAndSeedContext();
 
-//            optionsBuilder.UseInMemoryDatabase();
+                var repository = new CityInfoRepository(context);
 
-//            var context = new CityInfoContext(optionsBuilder.Options);
+                var controller = new CitiesController(_mapper, null, null, repository);
 
-//            context.Database.EnsureDeleted();
+                var result = controller.GetCities();
 
-//            context.Database.EnsureCreated();
+                Assert.NotNull(result);
 
-//            var cities = GetCityData();
+                var cities = ((OkObjectResult)result).Value as ICollection<CityDto>;
 
-//            context.Cities.AddRange(cities);
+                Assert.NotEmpty(cities);
+            }
+        }
 
-//            context.SaveChanges();
+        [Fact]
+        public void Get_City_Without_Points_Of_Interests()
+        {
+            using (var fakeCityInfoData = new CityInfoFakeData())
+            {
+                var context = fakeCityInfoData.CreateAndSeedContext();
 
-//            return context;
+                var repository = new CityInfoRepository(context);
 
-//        }
+                var controller = new CitiesController(_mapper, null, null, repository);
 
-//        private ICollection<City> GetCityData()
-//        {
-//            // init seed data
-//            var cities = new List<City>()
-//            {
-//                new City()
-//                {
-//                     Name = "New York City",
-//                     Description = "The one with that big park.",
-//                     PointsOfInterest = new List<PointOfInterest>()
-//                     {
-//                         new PointOfInterest() {
-//                             Name = "Central Park",
-//                             Description = "The most visited urban park in the United States."
-//                         },
-//                          new PointOfInterest() {
-//                             Name = "Empire State Building",
-//                             Description = "A 102-story skyscraper located in Midtown Manhattan."
-//                          },
-//                     }
-//                },
-//                new City()
-//                {
-//                    Name = "Antwerp",
-//                    Description = "The one with the cathedral that was never really finished.",
-//                    PointsOfInterest = new List<PointOfInterest>()
-//                     {
-//                         new PointOfInterest() {
-//                             Name = "Cathedral",
-//                             Description = "A Gothic style cathedral, conceived by architects Jan and Pieter Appelmans."
-//                         },
-//                          new PointOfInterest() {
-//                             Name = "Antwerp Central Station",
-//                             Description = "The the finest example of railway architecture in Belgium."
-//                          },
-//                     }
-//                },
-//                new City()
-//                {
-//                    Name = "Paris",
-//                    Description = "The one with that big tower.",
-//                    PointsOfInterest = new List<PointOfInterest>()
-//                     {
-//                         new PointOfInterest() {
-//                             Name = "Eiffel Tower",
-//                             Description =  "A wrought iron lattice tower on the Champ de Mars, named after engineer Gustave Eiffel."
-//                         },
-//                          new PointOfInterest() {
-//                             Name = "The Louvre",
-//                             Description = "The world's largest museum."
-//                          },
-//                     }
-//                }
-//            };
+                var result = controller.GetCity(2, false);
 
-//            return cities;
-//        }
-//    }
-//}
+                Assert.NotNull(result);
+
+                var city = ((OkObjectResult)result).Value as CityDto;
+
+                Assert.NotNull(city);
+                Assert.Empty(city.PointsOfInterest);
+            }
+        }
+
+        [Fact]
+        public void Get_City_With_Points_Of_Interests()
+        {
+            using (var fakeCityInfoData = new CityInfoFakeData())
+            {
+                var context = fakeCityInfoData.CreateAndSeedContext();
+
+                var repository = new CityInfoRepository(context);
+
+                var controller = new CitiesController(_mapper, null, null, repository);
+
+                var result = controller.GetCity(2, true);
+
+                Assert.NotNull(result);
+
+                var city = ((OkObjectResult)result).Value as CityDto;
+
+                Assert.NotNull(city);
+                Assert.NotEmpty(city.PointsOfInterest);
+            }
+        }
+
+        [Fact]
+        public void Get_All_Points_Of_Interest_for_City()
+        {
+            var fakeCityInfoData = new CityInfoFakeData();
+
+            var context = fakeCityInfoData.CreateAndSeedContext();
+
+            var repository = new CityInfoRepository(context);
+
+            var controller = new PointsOfInterestController(_mapper, null, null, repository);
+
+            var result = controller.GetPointsOfInterest(2);
+
+            Assert.NotNull(result);
+
+            var pointsOfInterest = ((OkObjectResult)result).Value as IEnumerable<PointOfInterestDto>;
+
+            Assert.NotEmpty(pointsOfInterest);
+            Assert.True(pointsOfInterest.Count() > 1);
+        }
+
+        [Fact]
+        public void Get_Single_Point_Of_Interest_for_City()
+        {
+            var fakeCityInfoData = new CityInfoFakeData();
+
+            var context = fakeCityInfoData.CreateAndSeedContext();
+
+            var repository = new CityInfoRepository(context);
+
+            var controller = new PointsOfInterestController(_mapper, null, null, repository);
+
+            var result = controller.GetPointOfInterest(2, 3);
+
+            Assert.NotNull(result);
+
+            var pointOfInterest = ((OkObjectResult)result).Value as PointOfInterestDto;
+
+            Assert.NotNull(pointOfInterest);
+            //Assert.True(pointOfInterest.City.Id == 2);
+            //Assert.NotNull(pointOfInterest.City);
+        }
+    }
+}

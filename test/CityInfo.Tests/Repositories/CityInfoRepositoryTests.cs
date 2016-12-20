@@ -12,9 +12,6 @@ namespace CityInfo.Tests.Repositories
 {
     public class CityInfoRepositoryTests
     {
-        CityInfoContext _context;
-        ICityInfoRepository _repository;
-
         [Fact]
         public void Get_All_Cities()
         {

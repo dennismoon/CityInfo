@@ -12,5 +12,9 @@ namespace CityInfo.API.Models
 
         [MaxLength(200)]
         public string Description { get; set; }
+
+        //public virtual CityDto City { get; set; }
+
+        //public int CityId { get; set; }
     }
 }

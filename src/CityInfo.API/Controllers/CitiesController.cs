@@ -21,7 +21,10 @@ namespace CityInfo.API.Controllers
         private IMailService _mailService;
         ICityInfoRepository _cityInfoRepository;
 
-        public CitiesController(IMapper mapper, ILogger<PointsOfInterestController> logger, IMailService mailService, 
+        public CitiesController(
+            IMapper mapper, 
+            ILogger<PointsOfInterestController> logger, 
+            IMailService mailService, 
             ICityInfoRepository cityInfoRepository)
         {
             _mapper = mapper;
