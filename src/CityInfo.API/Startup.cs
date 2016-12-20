@@ -16,6 +16,7 @@ using CityInfo.API.Repositories;
 using Swashbuckle.Swagger.Model;
 using Microsoft.Extensions.PlatformAbstractions;
 using System.IO;
+using AutoMapper;
 
 namespace CityInfo.API
 {
@@ -47,6 +48,14 @@ namespace CityInfo.API
                         castedResolver.NamingStrategy = null;
                     }
                 });
+
+            services.AddAutoMapper(cfg =>
+            {
+                cfg.CreateMap<Entities.City, Models.CityDto>();
+                cfg.CreateMap<Models.CityDto, Entities.City>();
+                cfg.CreateMap<Entities.PointOfInterest, Models.PointOfInterestDto>();
+                cfg.CreateMap<Models.PointOfInterestDto, Entities.PointOfInterest>();
+            });
 
 #if DEBUG
             services.AddTransient<IMailService, LocalMailService>();
@@ -117,13 +126,7 @@ namespace CityInfo.API
                 app.UseStatusCodePages();
             }
 
-            AutoMapper.Mapper.Initialize(cfg =>
-            {
-                cfg.CreateMap<Entities.City, Models.CityDto>();
-                cfg.CreateMap<Models.CityDto, Entities.City>();
-                cfg.CreateMap<Entities.PointOfInterest, Models.PointOfInterestDto>();
-                cfg.CreateMap<Models.PointOfInterestDto, Entities.PointOfInterest>();
-            });
+           
 
             app.UseStaticFiles();
 

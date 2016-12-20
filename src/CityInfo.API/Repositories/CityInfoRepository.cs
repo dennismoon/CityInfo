@@ -66,6 +66,11 @@ namespace CityInfo.API.Repositories
             else
             {
                 city = _context.Cities.Where(c => c.Id == id).FirstOrDefault();
+
+                if (city != null)
+                {
+                    city.PointsOfInterest = new List<PointOfInterest>();
+                }
             }
 
             return city;

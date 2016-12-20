@@ -19,7 +19,8 @@
         "Microsoft.EntityFrameworkCore.Tools": "1.1.0-preview4-final",
         "AutoMapper": "5.2.0",
         "Microsoft.EntityFrameworkCore.DynamicLinq": "1.0.3.3",
-        "System.Linq.Dynamic.Core": "1.0.6.9"   },
+        "System.Linq.Dynamic.Core": "1.0.6.9",
+        "AutoMapper.Extensions.Microsoft.DependencyInjection": "1.1.2"   },
 
     "tools": {
         "Microsoft.EntityFrameworkCore.Tools": "1.1.0-preview4-final",
@@ -38,7 +39,7 @@
     "buildOptions": {
         "emitEntryPoint": true,
         "preserveCompilationContext": true,
-        "xmlDoc": true
+        "xmlDoc": false
     },
 
     "runtimeOptions": {

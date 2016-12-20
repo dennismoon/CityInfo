@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CityInfo.API.Entities
@@ -17,7 +18,13 @@ namespace CityInfo.API.Entities
         public string Description { get; set; }
 
         [ForeignKey("CityId")]
-        public City City { get; set; }
+        public virtual City City { get; set; }
+
         public int CityId { get; set; }
+
+        public int Count()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

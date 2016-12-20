@@ -16,13 +16,15 @@ namespace CityInfo.API.Controllers
     [Route("api/cities")]
     public class PointsOfInterestController : Controller
     {
+        private readonly IMapper _mapper;
         private ILogger<PointsOfInterestController> _logger;
         private IMailService _mailService;
         ICityInfoRepository _cityInfoRepository;
 
-        public PointsOfInterestController(ILogger<PointsOfInterestController> logger, IMailService mailService,
+        public PointsOfInterestController(IMapper mapper, ILogger<PointsOfInterestController> logger, IMailService mailService,
             ICityInfoRepository cityInfoRepository)
         {
+            _mapper = mapper;
             _logger = logger;
             _mailService = mailService;
             _cityInfoRepository = cityInfoRepository;
@@ -49,7 +51,7 @@ namespace CityInfo.API.Controllers
 
                 var pointsOfInterestForCity = _cityInfoRepository.GetPointsOfInterestForCity(cityId);
 
-                var results = Mapper.Map<IEnumerable<PointOfInterestDto>>(pointsOfInterestForCity);
+                var results = _mapper.Map<IEnumerable<PointOfInterestDto>>(pointsOfInterestForCity);
 
                 return Ok(results);
             }
@@ -85,7 +87,7 @@ namespace CityInfo.API.Controllers
                 return NotFound();
             }
 
-            var result = Mapper.Map<PointOfInterestDto>(pointOfInterestForCity);
+            var result = _mapper.Map<PointOfInterestDto>(pointOfInterestForCity);
 
             return Ok(result);
         }
@@ -117,7 +119,7 @@ namespace CityInfo.API.Controllers
                 return NotFound();
             }
 
-            var newPointOfInterest = Mapper.Map<Entities.PointOfInterest>(pointOfInterest);
+            var newPointOfInterest = _mapper.Map<Entities.PointOfInterest>(pointOfInterest);
 
             _cityInfoRepository.AddPointOfInterestForCity(cityId, newPointOfInterest);
 
@@ -169,7 +171,7 @@ namespace CityInfo.API.Controllers
                 return NotFound();
             }
 
-            Mapper.Map(pointOfInterest, pointOfInterestEntity);
+            _mapper.Map(pointOfInterest, pointOfInterestEntity);
 
             bool success = _cityInfoRepository.Save();
 
@@ -208,7 +210,7 @@ namespace CityInfo.API.Controllers
                 return NotFound();
             }
 
-            var pointOfInterestToPatch = Mapper.Map<PointOfInterestDto>(pointOfInterestEntity);
+            var pointOfInterestToPatch = _mapper.Map<PointOfInterestDto>(pointOfInterestEntity);
 
             patchDoc.ApplyTo(pointOfInterestToPatch, ModelState);
 
@@ -229,7 +231,7 @@ namespace CityInfo.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            Mapper.Map(pointOfInterestToPatch, pointOfInterestEntity);
+            _mapper.Map(pointOfInterestToPatch, pointOfInterestEntity);
 
             bool success = _cityInfoRepository.Save();
 

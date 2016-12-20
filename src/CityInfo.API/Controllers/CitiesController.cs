@@ -16,13 +16,15 @@ namespace CityInfo.API.Controllers
     [Route("api/cities")]
     public class CitiesController : Controller
     {
+        private readonly IMapper _mapper;
         private ILogger<PointsOfInterestController> _logger;
         private IMailService _mailService;
         ICityInfoRepository _cityInfoRepository;
 
-        public CitiesController(ILogger<PointsOfInterestController> logger, IMailService mailService, 
+        public CitiesController(IMapper mapper, ILogger<PointsOfInterestController> logger, IMailService mailService, 
             ICityInfoRepository cityInfoRepository)
         {
+            _mapper = mapper;
             _logger = logger;
             _mailService = mailService;
             _cityInfoRepository = cityInfoRepository;
@@ -35,7 +37,7 @@ namespace CityInfo.API.Controllers
             {
                 var cities = _cityInfoRepository.GetCities();
 
-                var results = Mapper.Map<IEnumerable<CityDto>>(cities);
+                var results = _mapper.Map<IEnumerable<CityDto>>(cities);
 
                 return Ok(results);
             }
@@ -64,7 +66,7 @@ namespace CityInfo.API.Controllers
                     return NotFound();
                 }
 
-                var results = Mapper.Map<CityDto>(city);
+                var results = _mapper.Map<CityDto>(city);
 
                 return Ok(results);
             }
@@ -86,7 +88,7 @@ namespace CityInfo.API.Controllers
                 {
                     var cities = _cityInfoRepository.GetCitiesPaged(page.GetValueOrDefault(1), pageSize.GetValueOrDefault(10), searchText, sortField, sortDirection);
 
-                    var results = Mapper.Map<IEnumerable<CityDto>>(cities);
+                    var results = _mapper.Map<IEnumerable<CityDto>>(cities);
 
                     return Ok(results);
                 }
@@ -125,7 +127,7 @@ namespace CityInfo.API.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var newCity = Mapper.Map<Entities.City>(city);
+                var newCity = _mapper.Map<Entities.City>(city);
 
                 _cityInfoRepository.AddCity(newCity);
 
@@ -173,7 +175,7 @@ namespace CityInfo.API.Controllers
                 return NotFound();
             }
 
-            Mapper.Map(city, cityEntity);
+            _mapper.Map(city, cityEntity);
 
             bool success = _cityInfoRepository.Save();
 
@@ -202,7 +204,7 @@ namespace CityInfo.API.Controllers
                 return NotFound();
             }
 
-            var cityToPatch = Mapper.Map<CityDto>(cityEntity);
+            var cityToPatch = _mapper.Map<CityDto>(cityEntity);
 
             patchDoc.ApplyTo(cityToPatch, ModelState);
 
@@ -223,7 +225,7 @@ namespace CityInfo.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            Mapper.Map(cityToPatch, cityEntity);
+            _mapper.Map(cityToPatch, cityEntity);
 
             bool success = _cityInfoRepository.Save();
 
