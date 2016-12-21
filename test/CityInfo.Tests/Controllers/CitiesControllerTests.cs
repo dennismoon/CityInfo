@@ -28,10 +28,10 @@ namespace CityInfo.Tests.Controllers
         {
             var config = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<API.Entities.City, API.Models.CityDto>();
-                cfg.CreateMap<API.Models.CityDto, API.Entities.City>();
-                cfg.CreateMap<API.Entities.PointOfInterest, API.Models.PointOfInterestDto>();
-                cfg.CreateMap<API.Models.PointOfInterestDto, API.Entities.PointOfInterest>();
+                cfg.CreateMap<API.Entities.City, API.Models.CityDto>().MaxDepth(1);
+                cfg.CreateMap<API.Models.CityDto, API.Entities.City>().MaxDepth(1);
+                cfg.CreateMap<API.Entities.PointOfInterest, API.Models.PointOfInterestDto>().MaxDepth(1);
+                cfg.CreateMap<API.Models.PointOfInterestDto, API.Entities.PointOfInterest>().MaxDepth(1);
             });
 
             IMapper mapper = config.CreateMapper();
@@ -143,8 +143,8 @@ namespace CityInfo.Tests.Controllers
             var pointOfInterest = ((OkObjectResult)result).Value as PointOfInterestDto;
 
             Assert.NotNull(pointOfInterest);
-            //Assert.True(pointOfInterest.City.Id == 2);
-            //Assert.NotNull(pointOfInterest.City);
+            Assert.True(pointOfInterest.City.Id == 2);
+            Assert.NotNull(pointOfInterest.City);
         }
     }
 }
