@@ -271,5 +271,24 @@ namespace CityInfo.API.Controllers
 
             return NoContent();
         }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (_logger != null)
+                {
+                    _logger = null;
+                }
+
+                if (_cityInfoRepository != null)
+                {
+                    _cityInfoRepository.Dispose();
+                    _cityInfoRepository = null;
+                }
+            }
+
+            base.Dispose(disposing);
+        }
     }
 }

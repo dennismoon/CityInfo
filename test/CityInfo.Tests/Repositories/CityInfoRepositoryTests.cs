@@ -12,29 +12,31 @@ namespace CityInfo.Tests.Repositories
 {
     public class CityInfoRepositoryTests
     {
-        [Fact]
-        public void Get_All_Cities()
-        {
-            using (var fakeCityInfoData = new CityInfoFakeData())
-            {
-                var context = fakeCityInfoData.CreateAndSeedContext();
-
-                var repository = new CityInfoRepository(context);
-
-                var cities = repository.GetCities();
-
-                Assert.NotNull(cities);
-            }               
-        }
-
-        [Fact]
-        public void Get_City_Without_Points_Of_Interests()
+        private CityInfoRepository CreateSutWithDependencies()
         {
             var fakeCityInfoData = new CityInfoFakeData();
 
             var context = fakeCityInfoData.CreateAndSeedContext();
 
             var repository = new CityInfoRepository(context);
+
+            return repository;
+        }
+
+        [Fact]
+        public void Get_All_Cities()
+        {
+            var repository = CreateSutWithDependencies();
+
+            var cities = repository.GetCities();
+
+            Assert.NotNull(cities);
+        }
+
+        [Fact]
+        public void Get_City_Without_Points_Of_Interests()
+        {
+            var repository = CreateSutWithDependencies();
 
             var city = repository.GetCity(2, false);
 
@@ -45,11 +47,7 @@ namespace CityInfo.Tests.Repositories
         [Fact]
         public void Get_City_With_Points_Of_Interests()
         {
-            var fakeCityInfoData = new CityInfoFakeData();
-
-            var context = fakeCityInfoData.CreateAndSeedContext();
-
-            var repository = new CityInfoRepository(context);
+            var repository = CreateSutWithDependencies();
 
             var city = repository.GetCity(2, true);
 
@@ -60,11 +58,7 @@ namespace CityInfo.Tests.Repositories
         [Fact]
         public void Get_All_Points_Of_Interest_for_City()
         {
-            var fakeCityInfoData = new CityInfoFakeData();
-
-            var context = fakeCityInfoData.CreateAndSeedContext();
-
-            var repository = new CityInfoRepository(context);
+            var repository = CreateSutWithDependencies();
 
             var pointsOfInterest = repository.GetPointsOfInterestForCity(2);
 
@@ -75,11 +69,7 @@ namespace CityInfo.Tests.Repositories
         [Fact]
         public void Get_Single_Point_Of_Interest_for_City()
         {
-            var fakeCityInfoData = new CityInfoFakeData();
-
-            var context = fakeCityInfoData.CreateAndSeedContext();
-
-            var repository = new CityInfoRepository(context);
+            var repository = CreateSutWithDependencies();
 
             var pointOfInterest = repository.GetPointOfInterestForCity(2, 3);
 

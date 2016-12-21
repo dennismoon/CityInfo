@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CityInfo.API.Repositories
 {
-    public interface ICityInfoRepository
+    public interface ICityInfoRepository : IDisposable
     {
         bool CityExists(int id);
         IEnumerable<City> GetCities();

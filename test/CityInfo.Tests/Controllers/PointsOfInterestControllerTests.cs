@@ -10,7 +10,7 @@ using Xunit;
 
 namespace CityInfo.Tests.Controllers
 {
-    public class CitiesControllerTests
+    public class PointsOfInterestControllerTests
     {
         private IMapper InitializeAutomapper()
         {
@@ -27,7 +27,7 @@ namespace CityInfo.Tests.Controllers
             return mapper;
         }
 
-        private CitiesController CreateSutWithDependencies()
+        private PointsOfInterestController CreateSutWithDependencies()
         {
             var fakeCityInfoData = new CityInfoFakeData();
 
@@ -37,53 +37,40 @@ namespace CityInfo.Tests.Controllers
 
             var mapper = InitializeAutomapper();
 
-            var controller = new CitiesController(mapper, null, null, repository);
+            var controller = new PointsOfInterestController(mapper, null, null, repository);
 
             return controller;
         }
 
         [Fact]
-        public void Get_All_Cities()
+        public void Get_All_Points_Of_Interest_for_City()
         {
             var controller = CreateSutWithDependencies();
 
-            var result = controller.GetCities();
+            var result = controller.GetPointsOfInterest(2);
 
             Assert.NotNull(result);
 
-            var cities = ((OkObjectResult)result).Value as ICollection<CityDto>;
+            var pointsOfInterest = ((OkObjectResult)result).Value as IEnumerable<PointOfInterestDto>;
 
-            Assert.NotEmpty(cities);
+            Assert.NotEmpty(pointsOfInterest);
+            Assert.True(pointsOfInterest.Count() > 1);
         }
 
         [Fact]
-        public void Get_City_Without_Points_Of_Interests()
+        public void Get_Single_Point_Of_Interest_for_City()
         {
             var controller = CreateSutWithDependencies();
 
-            var result = controller.GetCity(2, false);
+            var result = controller.GetPointOfInterest(2, 3);
 
             Assert.NotNull(result);
 
-            var city = ((OkObjectResult)result).Value as CityDto;
+            var pointOfInterest = ((OkObjectResult)result).Value as PointOfInterestDto;
 
-            Assert.NotNull(city);
-            Assert.Empty(city.PointsOfInterest);
-        }
-
-        [Fact]
-        public void Get_City_With_Points_Of_Interests()
-        {
-            var controller = CreateSutWithDependencies();
-
-            var result = controller.GetCity(2, true);
-
-            Assert.NotNull(result);
-
-            var city = ((OkObjectResult)result).Value as CityDto;
-
-            Assert.NotNull(city);
-            Assert.NotEmpty(city.PointsOfInterest);
+            Assert.NotNull(pointOfInterest);
+            Assert.True(pointOfInterest.City.Id == 2);
+            Assert.NotNull(pointOfInterest.City);
         }
     }
 }

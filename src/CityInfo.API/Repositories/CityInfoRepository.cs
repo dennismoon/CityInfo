@@ -130,5 +130,13 @@ namespace CityInfo.API.Repositories
 
             return results.ToList();
         }
+
+        public void Dispose()
+        {
+            if (_context != null)
+            {
+                _context.Dispose();
+            }
+        }
     }
 }
